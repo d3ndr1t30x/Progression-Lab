@@ -10,6 +10,7 @@ import 'contextual_guides.dart';
 import 'strength_history_backfill.dart';
 import 'strength_history_review.dart';
 import 'strength_cycle_picker.dart';
+import 'training_history.dart';
 
 typedef OpenProgramWorkout =
     void Function(ProgramWeek week, int workoutIndex, bool retroactive);
@@ -911,7 +912,22 @@ class _ProgramNavigatorPageState extends State<ProgramNavigatorPage> {
 
       return Scaffold(
         backgroundColor: _ink,
-        appBar: AppBar(title: const Text('Year One Strength')),
+        appBar: AppBar(
+          title: const Text('Year One Strength'),
+          actions: [
+            IconButton(
+              key: const ValueKey('strength-workout-history'),
+              tooltip: 'Workout history',
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => TrainingHistoryScreen(store: widget.store),
+                ),
+              ),
+              icon: const Icon(Icons.history_rounded),
+            ),
+          ],
+        ),
         body: SafeArea(
           child: CustomScrollView(
             slivers: [
@@ -1006,7 +1022,16 @@ class _ProgramNavigatorPageState extends State<ProgramNavigatorPage> {
                             ),
                           ),
                           const SizedBox(height: 24),
-                          const _Eyebrow('Explore the plan'),
+                          const _Eyebrow('Workout calendar'),
+                          const SizedBox(height: 5),
+                          const Text(
+                            'Choose a phase, then expand any week to view its schedule or open a past logged workout.',
+                            style: TextStyle(
+                              color: Colors.white54,
+                              fontSize: 13,
+                              height: 1.35,
+                            ),
+                          ),
                           const SizedBox(height: 10),
                           _PhaseSelector(
                             selected: _phase,

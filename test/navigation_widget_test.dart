@@ -113,6 +113,57 @@ void main() {
     expect(find.text('Start a new run'), findsOneWidget);
   });
 
+  testWidgets('strength calendar opens past workout history and logged sets', (
+    tester,
+  ) async {
+    usePhoneSurface(tester, size: const Size(1080, 1920));
+    final record = WorkoutRecord(
+      week: 1,
+      workoutIndex: 0,
+      workout: 'Upper Body A',
+      date: DateTime(2026, 1, 5, 18),
+      status: WorkoutStatus.completed,
+      sessionId: 'past-strength-session',
+    );
+    final store = AppStore()
+      ..automaticBackupsEnabled = false
+      ..week = 20
+      ..workoutHistory = [record]
+      ..logs = [
+        SetLog(
+          exercise: 'Barbell Bench Press',
+          weight: 80,
+          reps: 5,
+          date: DateTime(2026, 1, 5, 18),
+          workout: 'Upper Body A',
+          sessionId: 'past-strength-session',
+        ),
+      ];
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ProgressionBrand.theme(),
+        home: ProgramNavigatorPage(
+          store: store,
+          onOpenWorkout: (_, _, _) {},
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Workout calendar'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('strength-workout-history')));
+    await tester.pumpAndSettle();
+    expect(find.text('Workout history'), findsOneWidget);
+    expect(find.text('Upper Body A'), findsOneWidget);
+
+    await tester.tap(find.text('View sets'));
+    await tester.pumpAndSettle();
+    expect(find.text('Logged workout'), findsOneWidget);
+    expect(find.text('Barbell Bench Press'), findsOneWidget);
+    expect(find.byType(TextField), findsWidgets);
+  });
+
   testWidgets('progress dashboard renders honest empty and populated states', (
     tester,
   ) async {
